@@ -1,4 +1,5 @@
-﻿import pandas as pd
+﻿import io
+import pandas as pd
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
 
@@ -9,7 +10,7 @@ from .analytics import compute_kpis
 @login_required
 def view_dashboard(request, dataset_id):
     dataset = get_object_or_404(Dataset, id=dataset_id, owner=request.user)
-    df = pd.read_json(dataset.cleaned_data, orient="records")
+    df = pd.read_json(io.StringIO(dataset.cleaned_data), orient="records")
 
     kpis = compute_kpis(df)
 
