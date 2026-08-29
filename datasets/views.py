@@ -2,8 +2,9 @@ import pandas as pd
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 
-from .models import Dataset
+from .models import Dataset, CleaningLog
 from .forms import DatasetUploadForm
+from .cleaning import clean_dataframe
 
 
 @login_required
@@ -18,13 +19,19 @@ def upload_dataset(request):
             else:
                 df = pd.read_excel(uploaded_file)
 
+            cleaned_df, log_entries = clean_dataframe(df)
+
             dataset = Dataset.objects.create(
                 owner=request.user,
                 file=uploaded_file,
                 original_filename=uploaded_file.name,
-                row_count=len(df),
-                column_count=len(df.columns),
-                cleaned_data=df.to_json(orient="records", date_format="iso"),
+                row_count=len(cleaned_df),
+                column_count=len(cleaned_df.columns),
+                cleaned_data=cleaned_df.to_json(orient="records", date_format="iso"),
+            )
+
+            CleaningLog.objects.bulk_create(
+                [CleaningLog(dataset=dataset, **entry) for entry in log_entries]
             )
 
             return redirect("datasets:list")
@@ -38,3 +45,4 @@ def upload_dataset(request):
 def dataset_list(request):
     datasets = Dataset.objects.filter(owner=request.user)
     return render(request, "datasets/list.html", {"datasets": datasets})
+
