@@ -2,6 +2,10 @@
 <a href="{% url 'datasets:upload' %}">Upload New</a>
 <ul>
 {% for ds in datasets %}
-    <li><a href="{% url 'datasets:detail' ds.id %}">{{ ds.original_filename }}</a> — {{ ds.row_count }} rows — {{ ds.uploaded_at }}</li>
+    <li>
+        <a href="{% url 'datasets:detail' ds.id %}">{{ ds.original_filename }}</a>
+        — {{ ds.row_count }} rows — {{ ds.uploaded_at }}
+        — <a href="{% url 'dashboard:view' ds.id %}">View Dashboard</a>
+    </li>
 {% endfor %}
 </ul>
