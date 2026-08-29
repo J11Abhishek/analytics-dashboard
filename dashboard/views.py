@@ -1,3 +1,25 @@
-from django.shortcuts import render
+﻿import pandas as pd
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404
 
-# Create your views here.
+from datasets.models import Dataset
+from .analytics import compute_kpis
+
+
+@login_required
+def view_dashboard(request, dataset_id):
+    dataset = get_object_or_404(Dataset, id=dataset_id, owner=request.user)
+    df = pd.read_json(dataset.cleaned_data, orient="records")
+
+    kpis = compute_kpis(df)
+
+    chart_data = {
+        "labels": df["product"].value_counts().index.tolist() if "product" in df else [],
+        "values": df["product"].value_counts().values.tolist() if "product" in df else [],
+    }
+
+    return render(request, "dashboard/view.html", {
+        "dataset": dataset,
+        "kpis": kpis,
+        "chart_data": chart_data,
+    })
