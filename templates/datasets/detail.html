@@ -1,0 +1,14 @@
+<h2>{{ dataset.original_filename }}</h2>
+<p>{{ dataset.row_count }} rows, {{ dataset.column_count }} columns</p>
+
+<h3>Cleaning Log</h3>
+{% if logs %}
+<ul>
+{% for log in logs %}
+    <li>{{ log.action }} — {{ log.detail }}</li>
+{% endfor %}
+</ul>
+{% else %}
+<p>No cleaning actions were needed — your data was already clean!</p>
+{% endif %}
+

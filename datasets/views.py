@@ -1,6 +1,6 @@
 import pandas as pd
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 
 from .models import Dataset, CleaningLog
 from .forms import DatasetUploadForm
@@ -45,4 +45,11 @@ def upload_dataset(request):
 def dataset_list(request):
     datasets = Dataset.objects.filter(owner=request.user)
     return render(request, "datasets/list.html", {"datasets": datasets})
+
+
+@login_required
+def dataset_detail(request, dataset_id):
+    dataset = get_object_or_404(Dataset, id=dataset_id, owner=request.user)
+    logs = dataset.cleaning_logs.all()
+    return render(request, "datasets/detail.html", {"dataset": dataset, "logs": logs})
 
