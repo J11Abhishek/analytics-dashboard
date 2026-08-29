@@ -16,3 +16,14 @@ class Dataset(models.Model):
 
     def __str__(self):
         return f"{self.original_filename} ({self.owner})"
+
+
+class CleaningLog(models.Model):
+    dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE, related_name="cleaning_logs")
+    action = models.CharField(max_length=255)
+    detail = models.CharField(max_length=500, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.action}: {self.detail}"
+
