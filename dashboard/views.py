@@ -19,6 +19,13 @@ def view_dashboard(request, dataset_id):
         "values": df["product"].value_counts().values.tolist() if "product" in df else [],
     }
 
+    if "date" in df.columns and "revenue" in df.columns:
+        d = df.dropna(subset=["date"])
+        d["date"] = pd.to_datetime(d["date"])
+        monthly = d.set_index("date").resample("ME")["revenue"].sum()
+        chart_data["revenue_labels"] = [dt.strftime("%b %Y") for dt in monthly.index]
+        chart_data["revenue_values"] = monthly.values.tolist()
+
     return render(request, "dashboard/view.html", {
         "dataset": dataset,
         "kpis": kpis,
