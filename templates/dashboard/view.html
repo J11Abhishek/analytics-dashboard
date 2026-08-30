@@ -41,6 +41,11 @@
     <canvas id="revenueChart"></canvas>
 </div>
 
+<div class="card" style="display:flex; gap:0.75rem;">
+    <a href="{% url 'dashboard:export_pdf' dataset.id %}">Export PDF</a>
+    <a href="{% url 'dashboard:export_excel' dataset.id %}">Export Excel</a>
+</div>
+
 {{ chart_data|json_script:"chart-data" }}
 
 <script>
